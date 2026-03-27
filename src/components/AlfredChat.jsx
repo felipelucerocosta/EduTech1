@@ -2,8 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Send, X, MessageCircle } from 'lucide-react';
 import './AlfredChat.css';
 
-const AlfredChat = () => {
+const AlfredChat = ({ openSignal }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (openSignal > 0) setIsOpen(true);
+  }, [openSignal]);
   const [messages, setMessages] = useState([
     { role: 'alfred', text: 'Buenas, dame tu mail institucional para ayudarte a iniciar sesión, ¿cuál es tu mail?' }
   ]);
