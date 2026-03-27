@@ -107,6 +107,15 @@
   animation: slideFadeInRight 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
+.main-logo {
+  height: 90px;
+  width: auto;
+  margin-bottom: 24px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+  align-self: flex-start;
+}
+
 .branding-badge {
   display: inline-flex;
   align-items: center;

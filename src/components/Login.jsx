@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Lock, ArrowRight, Sparkles, Cpu, BookOpen, Eye, EyeOff, CheckCircle2, Loader2 } from 'lucide-react';
 import AlfredChat from './AlfredChat';
+import logoImg from '../assets/logo-tecnica.png';
 import './Login.css';
 
 const Login = ({ onLogin }) => {
@@ -47,6 +48,8 @@ const Login = ({ onLogin }) => {
         
         {/* Left section - Context & Branding */}
         <div className="login-branding">
+          <img src={logoImg} alt="Logo Educación Técnica" className="main-logo" />
+
           <div className="branding-badge" role="status" aria-label="Institución">
             <Sparkles size={16} className="badge-icon" aria-hidden="true" />
             <span>ET 29 de 6 "Reconquista de BS AS"</span>
