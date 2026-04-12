@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Lock, ArrowRight, Sparkles, Cpu, BookOpen, Eye, EyeOff, CheckCircle2, Loader2 } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Sparkles, Cpu, BookOpen, Eye, EyeOff, CheckCircle2, Loader2, AlertCircle } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 import AlfredChat from './AlfredChat';
 import logoImg from '../assets/logo-tecnica.png';
 import './Login.css';
 
 const Login = ({ onLogin }) => {
+  const { login } = useAppContext();
   const [emailFocus, setEmailFocus] = useState(false);
   const [passFocus, setPassFocus] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isValidEmail, setIsValidEmail] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const [openChatSignal, setOpenChatSignal] = useState(0);
 
   const handleForgotPassword = (e) => {
@@ -24,15 +28,27 @@ const Login = ({ onLogin }) => {
     setIsValidEmail(emailRegex.test(email));
   }, [email]);
 
+  // Clear error when user types
+  useEffect(() => {
+    if (errorMsg) setErrorMsg('');
+  }, [email, password]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!email || isLoading) return;
+    if (!email || !password || isLoading) return;
     
     setIsLoading(true);
+    setErrorMsg('');
     // Simulate network authentication delay for better UX
     setTimeout(() => {
-      onLogin();
-    }, 1500);
+      const result = login(email, password);
+      if (result.success) {
+        onLogin();
+      } else {
+        setErrorMsg(result.error);
+        setIsLoading(false);
+      }
+    }, 1200);
   };
 
   return (
@@ -74,6 +90,19 @@ const Login = ({ onLogin }) => {
               <span>Recursos Académicos 24/7</span>
             </div>
           </div>
+
+          {/* Test accounts info */}
+          <div className="test-accounts-info">
+            <h4>🔑 Cuentas de prueba</h4>
+            <div className="test-account">
+              <span className="test-role">Profesor:</span>
+              <span className="test-cred">profesor@tecnica29.edu.ar / prof1234</span>
+            </div>
+            <div className="test-account">
+              <span className="test-role">Alumno:</span>
+              <span className="test-cred">alumno@tecnica29.edu.ar / alu1234</span>
+            </div>
+          </div>
         </div>
 
         {/* Right section - Login Form */}
@@ -92,7 +121,7 @@ const Login = ({ onLogin }) => {
                   <input 
                     id="emailInput"
                     type="email" 
-                    placeholder="ejemplo@alu.tecnica29de6.edu.ar" 
+                    placeholder="ejemplo@tecnica29.edu.ar" 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required 
@@ -127,7 +156,9 @@ const Login = ({ onLogin }) => {
                     <input 
                       id="passInput"
                       type={showPassword ? "text" : "password"} 
-                      placeholder="••••••••••" 
+                      placeholder="••••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       required 
                       onFocus={() => setPassFocus(true)}
                       onBlur={() => setPassFocus(false)}
@@ -146,10 +177,18 @@ const Login = ({ onLogin }) => {
                 </div>
               </div>
 
+              {/* Error message */}
+              {errorMsg && (
+                <div className="login-error-msg">
+                  <AlertCircle size={18} />
+                  <span>{errorMsg}</span>
+                </div>
+              )}
+
               <button 
                 type="submit" 
                 className={`submit-btn ${isLoading ? 'loading' : ''}`} 
-                disabled={isLoading || !email}
+                disabled={isLoading || !email || !password}
                 aria-busy={isLoading}
               >
                 {isLoading ? (

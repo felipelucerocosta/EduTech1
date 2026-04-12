@@ -2,7 +2,7 @@ import React from 'react';
 import { LayoutDashboard, CalendarDays, FolderOpen, HelpCircle } from 'lucide-react';
 import './Sidebar.css';
 
-const Sidebar = ({ activeItem = 'dashboard' }) => {
+const Sidebar = ({ activeItem = 'dashboard', onViewChange }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Panel de Control', icon: LayoutDashboard },
     { id: 'entregas', label: 'Próximas Entregas', icon: CalendarDays },
@@ -23,24 +23,17 @@ const Sidebar = ({ activeItem = 'dashboard' }) => {
         {menuItems.map((item) => {
           const Icon = item.icon;
           return (
-            <a 
+            <button 
               key={item.id}
-              href="#"
+              onClick={() => onViewChange(item.id)}
               className={`nav-item ${activeItem === item.id ? 'active' : ''}`}
             >
               <Icon size={18} strokeWidth={2.5} className="nav-icon" />
               <span>{item.label}</span>
-            </a>
+            </button>
           );
         })}
       </nav>
-      
-      <div className="sidebar-illustration">
-        <div className="illustration-box">
-          <h4>EduTech Premium</h4>
-          <p>Potenciando la educación técnica del futuro.</p>
-        </div>
-      </div>
     </div>
   );
 };

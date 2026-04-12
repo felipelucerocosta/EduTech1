@@ -3,7 +3,7 @@ import Sidebar from './Sidebar';
 import TopNav from './TopNav';
 import './Layout.css';
 
-const Layout = ({ children, currentView, onViewChange }) => {
+const Layout = ({ children, currentView, onViewChange, onLogout }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleViewChange = (view) => {
@@ -18,13 +18,14 @@ const Layout = ({ children, currentView, onViewChange }) => {
         <div className="mobile-overlay" onClick={() => setIsMobileMenuOpen(false)}></div>
       )}
       <div className={`sidebar-wrapper ${isMobileMenuOpen ? 'open' : ''}`}>
-        <Sidebar activeItem={currentView === 'dashboard' || currentView === 'classView' ? 'dashboard' : ''} />
+        <Sidebar activeItem={currentView} onViewChange={handleViewChange} />
       </div>
       <div className="layout-main">
         <TopNav 
           currentView={currentView} 
           onViewChange={handleViewChange} 
-          onMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+          onMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          onLogout={onLogout}
         />
         <div className="layout-content-scrollable">
           {children}

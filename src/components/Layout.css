@@ -3,11 +3,8 @@
   width: 100vw;
   height: 100vh;
   overflow: hidden;
-  /* Very light and pleasant mesh background for the inner app */
-  background: #f8fafc;
-  background-image: 
-    radial-gradient(at 100% 0%, rgba(56, 189, 248, 0.1) 0, transparent 40%), 
-    radial-gradient(at 0% 100%, rgba(129, 140, 248, 0.08) 0, transparent 40%);
+  /* Tech Portal Background - Transparent to show App.css background */
+  background: transparent;
   position: relative;
 }
 
