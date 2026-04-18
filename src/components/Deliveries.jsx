@@ -1,44 +1,17 @@
 import React from 'react';
-import { Calendar, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { Calendar, CheckCircle2, Clock, AlertCircle, Inbox } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 import './Deliveries.css';
 
 const Deliveries = () => {
-  const tasks = [
-    {
-      id: 1,
-      title: 'Plano de Instalación Eléctrica - Nave A',
-      subject: 'Instalaciones Eléctricas',
-      dueDate: '15 de Octubre',
-      status: 'pending',
-      priority: 'high',
-      icon: '⚡'
-    },
-    {
-      id: 2,
-      title: 'Informe de Resistencia de Materiales',
-      subject: 'Mecánica Técnica',
-      dueDate: '18 de Octubre',
-      status: 'in-progress',
-      priority: 'medium',
-      icon: '⚙️'
-    },
-    {
-      id: 3,
-      title: 'Cómputo y Presupuesto de Obra',
-      subject: 'Gestión de Obra',
-      dueDate: '12 de Octubre',
-      status: 'completed',
-      priority: 'low',
-      icon: '📊'
-    }
-  ];
+  const { tasks } = useAppContext();
 
   const getStatusIcon = (status) => {
     switch (status) {
       case 'completed': return <CheckCircle2 size={18} className="status-completed" />;
       case 'in-progress': return <Clock size={18} className="status-progress" />;
       case 'pending': return <AlertCircle size={18} className="status-pending" />;
-      default: return null;
+      default: return <AlertCircle size={18} className="status-pending" />;
     }
   };
 
@@ -47,12 +20,12 @@ const Deliveries = () => {
       case 'completed': return 'Completado';
       case 'in-progress': return 'En Progreso';
       case 'pending': return 'Pendiente';
-      default: return '';
+      default: return 'Pendiente';
     }
   };
 
   return (
-    <div className="deliveries-container">
+    <div className="deliveries-container animate-fade-in">
       <div className="deliveries-header">
         <h1 className="page-title">Próximas Entregas</h1>
         <div className="title-divider"></div>
@@ -60,34 +33,42 @@ const Deliveries = () => {
       </div>
 
       <div className="tasks-list">
-        {tasks.map((task) => (
-          <div key={task.id} className={`task-card ${task.status}`}>
-            <div className="task-content">
-              <div className="task-icon-box">
-                <span className="task-emoji">{task.icon}</span>
-              </div>
-              <div className="task-info">
-                <div className="task-top">
-                  <span className="task-subject">{task.subject}</span>
-                  <div className={`priority-tag ${task.priority}`}>
-                    {task.priority === 'high' ? 'Crítico' : task.priority === 'medium' ? 'Importante' : 'Normal'}
-                  </div>
+        {tasks.length === 0 ? (
+          <div className="empty-state" style={{marginTop: '40px'}}>
+            <Inbox size={48} color="var(--text-dim)" style={{marginBottom: '16px'}} />
+            <h3>No hay entregas pendientes</h3>
+            <p className="page-subtitle">Las tareas aparecerán cuando un profesor las asigne.</p>
+          </div>
+        ) : (
+          tasks.map((task) => (
+            <div key={task.id} className={`task-card ${task.status || 'pending'}`}>
+              <div className="task-content">
+                <div className="task-icon-box">
+                  <span className="task-emoji">{task.icon || '📝'}</span>
                 </div>
-                <h3 className="task-title">{task.title}</h3>
-                <div className="task-meta">
-                  <div className="meta-item">
-                    <Calendar size={14} />
-                    <span>Entrega: {task.dueDate}</span>
+                <div className="task-info">
+                  <div className="task-top">
+                    <span className="task-subject">{task.subject}</span>
+                    <div className={`priority-tag ${task.priority || 'medium'}`}>
+                      {task.priority === 'high' ? 'Crítico' : task.priority === 'medium' ? 'Importante' : 'Normal'}
+                    </div>
                   </div>
-                  <div className="meta-item status">
-                    {getStatusIcon(task.status)}
-                    <span>{getStatusText(task.status)}</span>
+                  <h3 className="task-title">{task.title}</h3>
+                  <div className="task-meta">
+                    <div className="meta-item">
+                      <Calendar size={14} />
+                      <span>Entrega: {task.dueDate}</span>
+                    </div>
+                    <div className="meta-item status">
+                      {getStatusIcon(task.status)}
+                      <span>{getStatusText(task.status)}</span>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

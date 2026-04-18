@@ -1,19 +1,15 @@
 import React, { useState } from 'react';
-import { Search, BookOpen, Download, ExternalLink, Filter } from 'lucide-react';
+import { Search, Download, ExternalLink, Inbox } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 import './Resources.css';
 
 const Resources = () => {
+  const { resources } = useAppContext();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [downloadingId, setDownloadingId] = useState(null);
 
   const categories = ['Todos', 'Manuales', 'Planos', 'Software', 'Tutoriales'];
-  const resources = [
-    { id: 1, title: 'Manual de AutoCAD 2024 - Avanzado', type: 'PDF', category: 'Manuales', size: '12.4 MB', icon: '📘' },
-    { id: 2, title: 'Esquema de Tablero Principal Técnica 29', type: 'DWG', category: 'Planos', size: '2.8 MB', icon: '📐' },
-    { id: 3, title: 'Simulador de Circuitos Logisim-evolution', type: 'EXE', category: 'Software', size: '85 MB', icon: '💾' },
-    { id: 4, title: 'Guía de Programación en PLC Siemens', type: 'PDF', category: 'Tutoriales', size: '5.1 MB', icon: '📠' }
-  ];
 
   const handleDownload = (id) => {
     setDownloadingId(id);
@@ -27,7 +23,7 @@ const Resources = () => {
   });
 
   return (
-    <div className="resources-container">
+    <div className="resources-container animate-fade-in">
       <div className="resources-header">
         <h1 className="page-title">Recursos Técnicos</h1>
         <div className="title-divider"></div>
@@ -58,32 +54,45 @@ const Resources = () => {
       </div>
 
       <div className="resources-grid">
-        {filteredResources.map((res) => (
-          <div key={res.id} className={`resource-card ${downloadingId === res.id ? 'downloading' : ''}`}>
-            <div className="resource-top">
-              <div className="resource-icon-box">{res.icon}</div>
-              <div className="resource-type-badge">{res.type}</div>
+        {resources.length === 0 ? (
+          <div className="empty-state" style={{gridColumn: '1 / -1', marginTop: '40px'}}>
+            <Inbox size={48} color="var(--text-dim)" style={{marginBottom: '16px'}} />
+            <h3>No hay recursos disponibles</h3>
+            <p className="page-subtitle">Los materiales aparecerán cuando un profesor los suba.</p>
+          </div>
+        ) : filteredResources.length === 0 ? (
+            <div className="empty-state" style={{gridColumn: '1 / -1', marginTop: '40px'}}>
+                <h3>No se encontraron resultados</h3>
+                <p className="page-subtitle">Ajustá los filtros o la búsqueda.</p>
             </div>
-            <div className="resource-body">
-              <h3 className="resource-title">{res.title}</h3>
-              <span className="resource-category">{res.category}</span>
-            </div>
-            <div className="resource-footer">
-              <span className="resource-size">{downloadingId === res.id ? 'Descargando...' : res.size}</span>
-              <div className="resource-actions">
-                <button 
-                  className={`res-btn icon ${downloadingId === res.id ? 'active' : ''}`}
-                  onClick={() => handleDownload(res.id)}
-                >
-                  <Download size={16} />
-                </button>
-                <button className="res-btn icon">
-                  <ExternalLink size={16} />
-                </button>
+        ) : (
+          filteredResources.map((res) => (
+            <div key={res.id} className={`resource-card ${downloadingId === res.id ? 'downloading' : ''}`}>
+              <div className="resource-top">
+                <div className="resource-icon-box">{res.icon || '📦'}</div>
+                <div className="resource-type-badge">{res.type}</div>
+              </div>
+              <div className="resource-body">
+                <h3 className="resource-title">{res.title}</h3>
+                <span className="resource-category">{res.category}</span>
+              </div>
+              <div className="resource-footer">
+                <span className="resource-size">{downloadingId === res.id ? 'Descargando...' : res.size}</span>
+                <div className="resource-actions">
+                  <button 
+                    className={`res-btn icon ${downloadingId === res.id ? 'active' : ''}`}
+                    onClick={() => handleDownload(res.id)}
+                  >
+                    <Download size={16} />
+                  </button>
+                  <button className="res-btn icon">
+                    <ExternalLink size={16} />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

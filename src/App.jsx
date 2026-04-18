@@ -5,7 +5,6 @@ import Login from './components/Login';
 import Layout from './components/Layout';
 import Dashboard from './components/Dashboard';
 import ClassView from './components/ClassView';
-
 import Deliveries from './components/Deliveries';
 import Resources from './components/Resources';
 import Support from './components/Support';
@@ -13,10 +12,17 @@ import Support from './components/Support';
 function AppInner() {
   const { currentUser, logout } = useAppContext();
   const [currentView, setCurrentView] = useState('login');
+  const [selectedClassId, setSelectedClassId] = useState(null);
 
   const handleLogout = () => {
     logout();
     setCurrentView('login');
+    setSelectedClassId(null);
+  };
+
+  const handleViewClass = (classId) => {
+    setSelectedClassId(classId);
+    setCurrentView('classView');
   };
 
   const renderView = () => {
@@ -26,8 +32,8 @@ function AppInner() {
 
     return (
       <Layout currentView={currentView} onViewChange={setCurrentView} onLogout={handleLogout}>
-        {currentView === 'dashboard' && <Dashboard onViewClass={() => setCurrentView('classView')} />}
-        {currentView === 'classView' && <ClassView />}
+        {currentView === 'dashboard' && <Dashboard onViewClass={handleViewClass} />}
+        {currentView === 'classView' && <ClassView classId={selectedClassId} />}
         {currentView === 'entregas' && <Deliveries />}
         {currentView === 'recursos' && <Resources />}
         {currentView === 'soporte' && <Support />}

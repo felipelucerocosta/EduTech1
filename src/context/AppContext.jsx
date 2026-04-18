@@ -16,20 +16,26 @@ const TEST_ACCOUNTS = [
   },
 ];
 
-// ─── localStorage helpers ────────────────────────────
-const CLASSES_KEY = 'edutech_classes';
+// ─── localStorage keys ───────────────────────────────
+const KEYS = {
+  CLASSES: 'edutech_classes',
+  TASKS: 'edutech_tasks',
+  RESOURCES: 'edutech_resources',
+  MESSAGES: 'edutech_messages',
+};
 
-const loadClasses = () => {
+// ─── Persistence helpers ─────────────────────────────
+const loadFromStorage = (key) => {
   try {
-    const raw = localStorage.getItem(CLASSES_KEY);
+    const raw = localStorage.getItem(key);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
   }
 };
 
-const saveClasses = (classes) => {
-  localStorage.setItem(CLASSES_KEY, JSON.stringify(classes));
+const saveToStorage = (key, data) => {
+  localStorage.setItem(key, JSON.stringify(data));
 };
 
 // ─── Context ─────────────────────────────────────────
@@ -37,71 +43,112 @@ const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
-  const [classes, setClasses] = useState(loadClasses);
+  const [classes, setClasses] = useState(() => loadFromStorage(KEYS.CLASSES));
+  const [tasks, setTasks] = useState(() => loadFromStorage(KEYS.TASKS));
+  const [resources, setResources] = useState(() => loadFromStorage(KEYS.RESOURCES));
+  const [messages, setMessages] = useState(() => loadFromStorage(KEYS.MESSAGES));
 
-  // Persist classes whenever they change
-  useEffect(() => {
-    saveClasses(classes);
-  }, [classes]);
+  // Persist all state whenever it changes
+  useEffect(() => { saveToStorage(KEYS.CLASSES, classes); }, [classes]);
+  useEffect(() => { saveToStorage(KEYS.TASKS, tasks); }, [tasks]);
+  useEffect(() => { saveToStorage(KEYS.RESOURCES, resources); }, [resources]);
+  useEffect(() => { saveToStorage(KEYS.MESSAGES, messages); }, [messages]);
 
   /**
-   * Authenticate against hardcoded test accounts.
-   * Returns { success, user?, error? }
+   * Auth
    */
   const login = (email, password) => {
     const account = TEST_ACCOUNTS.find(
       (a) => a.email.toLowerCase() === email.toLowerCase() && a.password === password
     );
     if (!account) {
-      return { success: false, error: 'Credenciales incorrectas. Verificá tu correo y contraseña.' };
+      return { success: false, error: 'Credenciales incorrectas.' };
     }
     const user = { email: account.email, role: account.role, name: account.name };
     setCurrentUser(user);
     return { success: true, user };
   };
 
-  const logout = () => {
-    setCurrentUser(null);
+  const logout = () => setCurrentUser(null);
+
+  /**
+   * Class Management
+   */
+  const addClass = ({ materia, curso, division, turno }) => {
+    const newClass = {
+      id: Math.random().toString(36).substr(2, 9),
+      materia, curso, division, turno,
+      profesor: currentUser?.name || 'Profesor',
+      profesorEmail: currentUser?.email || '',
+      createdAt: new Date().toISOString(),
+      alumnos: currentUser?.role === 'alumno' ? [] : ['María López', 'Carlos Ruiz', 'Sofía Duarte'], // Mock members for now
+    };
+    setClasses(prev => [...prev, newClass]);
+    return { success: true };
+  };
+
+  const deleteClass = (classId) => {
+    setClasses(prev => prev.filter(c => c.id !== classId));
   };
 
   /**
-   * Create a new class.
-   * Uniqueness key: materia + curso + division + turno (case-insensitive).
-   * Returns { success, error? }
+   * Task Management
    */
-  const addClass = ({ materia, curso, division, turno }) => {
-    const key = `${materia}|${curso}|${division}|${turno}`.toLowerCase();
-    const exists = classes.some(
-      (c) => `${c.materia}|${c.curso}|${c.division}|${c.turno}`.toLowerCase() === key
-    );
-    if (exists) {
-      return { success: false, error: 'Ya existe una clase con esa materia, curso, división y turno.' };
-    }
-    const newClass = {
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      materia,
-      curso,
-      division,
-      turno,
-      profesor: currentUser?.name || 'Desconocido',
-      profesorEmail: currentUser?.email || '',
+  const addTask = (taskData) => {
+    const newTask = {
+      id: Math.random().toString(36).substr(2, 9),
+      ...taskData,
       createdAt: new Date().toISOString(),
-      alumnos: [],
     };
-    setClasses((prev) => [...prev, newClass]);
+    setTasks(prev => [...prev, newTask]);
     return { success: true };
   };
 
   /**
-   * Delete a class by id (only professor who created it).
+   * Resource Management
    */
-  const deleteClass = (classId) => {
-    setClasses((prev) => prev.filter((c) => c.id !== classId));
+  const addResource = (resourceData) => {
+    const newResource = {
+      id: Math.random().toString(36).substr(2, 9),
+      ...resourceData,
+      createdAt: new Date().toISOString(),
+    };
+    setResources(prev => [...prev, newResource]);
+    return { success: true };
+  };
+
+  /**
+   * Message Management
+   */
+  const addMessage = (msgData) => {
+    const newMessage = {
+      id: Math.random().toString(36).substr(2, 9),
+      ...msgData,
+      author: currentUser?.name || 'Usuario',
+      authorRole: currentUser?.role || 'alumno',
+      timestamp: new Date().toISOString(),
+      likes: 0,
+    };
+    setMessages(prev => [...prev, newMessage]);
+    return { success: true };
   };
 
   return (
     <AppContext.Provider
-      value={{ currentUser, classes, login, logout, addClass, deleteClass }}
+      value={{ 
+        currentUser, 
+        classes, 
+        tasks, 
+        resources, 
+        messages,
+        login, 
+        logout, 
+        addClass, 
+        deleteClass,
+        addTask,
+        addResource,
+        addMessage,
+      }}
     >
       {children}
     </AppContext.Provider>

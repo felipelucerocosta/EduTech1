@@ -60,7 +60,7 @@ const Dashboard = ({ onViewClass }) => {
   };
 
   return (
-    <div className="dashboard-container">
+    <div className="dashboard-container animate-fade-in">
       <div className="dashboard-header">
         <div className="header-titles">
           <h2 className="page-title">MIS CLASES</h2>
