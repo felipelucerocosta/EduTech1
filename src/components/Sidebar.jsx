@@ -4,9 +4,8 @@ import './Sidebar.css';
 const Sidebar = ({ activeItem = 'dashboard', onViewChange }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Panel de Control', icon: LayoutDashboard },
-    { id: 'entregas', label: 'Próximas Entregas', icon: CalendarDays },
+    { id: 'entregas', label: 'Trabajos y Entregas', icon: CalendarDays },
     { id: 'recursos', label: 'Recursos', icon: FolderOpen },
-    { id: 'soporte', label: 'Soporte', icon: HelpCircle },
   ];
 
   return (

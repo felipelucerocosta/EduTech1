@@ -7,7 +7,6 @@ import Dashboard from './components/Dashboard';
 import ClassView from './components/ClassView';
 import Deliveries from './components/Deliveries';
 import Resources from './components/Resources';
-import Support from './components/Support';
 import Calendar from './components/Calendar';
 
 function AppInner() {
@@ -37,7 +36,6 @@ function AppInner() {
         {currentView === 'classView' && <ClassView classId={selectedClassId} />}
         {currentView === 'entregas' && <Deliveries />}
         {currentView === 'recursos' && <Resources />}
-        {currentView === 'soporte' && <Support />}
       </Layout>
     );
   };

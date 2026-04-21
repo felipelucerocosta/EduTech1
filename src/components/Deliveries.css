@@ -7,7 +7,45 @@
 }
 
 .deliveries-header {
-  margin-bottom: 40px;
+  margin-bottom: 32px;
+}
+
+/* Sub-tabs */
+.deliveries-sub-tabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(8px);
+  padding: 6px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  width: fit-content;
+}
+
+.sub-tab {
+  padding: 9px 22px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sub-tab:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.sub-tab.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 6px 16px -4px rgba(99, 102, 241, 0.4);
 }
 
 .tasks-list {
@@ -134,4 +172,92 @@
     align-items: flex-start;
     gap: 8px;
   }
+}
+
+/* Professor: Submissions Dropdown */
+.submissions-dropdown {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.submissions-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-dim);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.no-submissions {
+  font-size: 13px;
+  color: var(--text-dim);
+  text-align: center;
+  padding: 10px;
+}
+
+.submissions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.submission-item-mini {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 12px;
+  transition: var(--transition);
+}
+
+.submission-item-mini:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--primary);
+}
+
+.sub-user-info, .sub-file-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.sub-user-info {
+  color: white;
+  font-weight: 600;
+  min-width: 100px;
+}
+
+.sub-file-info {
+  color: #818cf8;
+  flex: 1;
+  min-width: 0;
+}
+
+.file-name-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-download-mini {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-download-mini:hover {
+  transform: scale(1.1);
+  filter: brightness(1.2);
 }

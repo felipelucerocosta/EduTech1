@@ -44,7 +44,7 @@ const MATERIA_ICONS = {
 const DEFAULT_GRADIENT = 'linear-gradient(135deg, #38bdf8 0%, #3b82f6 100%)';
 
 const Dashboard = ({ onViewClass }) => {
-  const { currentUser, classes, deleteClass } = useAppContext();
+  const { currentUser, classes, deleteClass, tasks, submissions } = useAppContext();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
 
@@ -57,6 +57,17 @@ const Dashboard = ({ onViewClass }) => {
       deleteClass(classId);
       setDeletingId(null);
     }, 300);
+  };
+
+  const getPendingCount = (classId) => {
+    const classTasks = tasks.filter(t => t.classId === classId);
+    if (isProfesor) return `${classTasks.length} tareas`;
+
+    const userSubmissions = submissions.filter(
+      s => s.classId === classId && s.authorEmail === currentUser?.email
+    );
+    const pending = classTasks.length - userSubmissions.length;
+    return `${pending} pendiente${pending !== 1 ? 's' : ''}`;
   };
 
   return (
@@ -145,7 +156,7 @@ const Dashboard = ({ onViewClass }) => {
                 <div className="card-footer">
                   <div className="footer-item">
                     <Calendar size={14} />
-                    <span>0 tareas</span>
+                    <span>{getPendingCount(cls.id)}</span>
                   </div>
                   <div className="footer-item">
                     <Users size={14} />

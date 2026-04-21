@@ -27,16 +27,27 @@ const SubmitWorkModal = ({ isOpen, onClose, task }) => {
   };
 
   const processFile = (f) => {
-    const allowedTypes = ['application/pdf', 'application/msword',
+    const allowedTypes = ['application/pdf', 'application/msword', 
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'application/zip', 'image/png', 'image/jpeg'];
+    
     if (!allowedTypes.some(t => f.type === t) && !f.name.match(/\.(pdf|doc|docx|zip|png|jpg|jpeg)$/i)) {
       setError('Formato no válido. Subí PDF, Word, ZIP o imágenes.');
       return;
     }
     setError('');
     const sizeMB = (f.size / (1024 * 1024)).toFixed(2);
-    setFile({ name: f.name, size: `${sizeMB} MB`, type: f.type || 'archivo' });
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setFile({ 
+        name: f.name, 
+        size: `${sizeMB} MB`, 
+        type: f.type || 'archivo',
+        data: e.target.result // Base64 string
+      });
+    };
+    reader.readAsDataURL(f);
   };
 
   const handleDrop = (e) => {
@@ -55,6 +66,8 @@ const SubmitWorkModal = ({ isOpen, onClose, task }) => {
     e.preventDefault();
     if (!file) { setError('Seleccioná un archivo para entregar.'); return; }
     setIsSubmitting(true);
+    
+    // Simulate upload delay
     setTimeout(() => {
       addSubmission({
         taskId: task.id,
@@ -62,6 +75,7 @@ const SubmitWorkModal = ({ isOpen, onClose, task }) => {
         classId: task.classId,
         fileName: file.name,
         fileSize: file.size,
+        fileData: file.data, // Storing base64
         comment,
       });
       setIsSubmitting(false);

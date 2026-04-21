@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Settings, MessageCircle, Heart, ThumbsUp, MoreHorizontal, 
   FileText, Send, Plus, Calendar as CalendarIcon, BookOpen,
-  Clock, CheckCircle2
+  Clock, CheckCircle2, Download
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import AddTaskModal from './AddTaskModal';
@@ -42,6 +42,16 @@ const ClassView = ({ classId }) => {
       const input = gradeInputs[subId] || {};
       if (!input.grade) return;
       gradeSubmission(subId, input.grade, input.feedback || '');
+    };
+
+    const handleDownload = (fileData, fileName) => {
+      if (!fileData) return;
+      const link = document.createElement('a');
+      link.href = fileData;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     };
 
     return (
@@ -135,7 +145,7 @@ const ClassView = ({ classId }) => {
                     )}
                   </div>
 
-                  {/* Professor: expanded submission list with grading */}
+                  {/* Professor: expanded submission list with grading and DOWNLOAD */}
                   {isProfesor && isExpanded && (
                     <div className="submissions-panel">
                       {taskSubmissions.length === 0 ? (
@@ -150,11 +160,21 @@ const ClassView = ({ classId }) => {
                                 <div className="submission-avatar">
                                   {sub.authorName?.[0] || 'A'}
                                 </div>
-                                <div>
+                                <div style={{ flex: 1 }}>
                                   <p className="submission-student-name">{sub.authorName}</p>
-                                  <p className="submission-file">
-                                    📎 {sub.fileName} · {sub.fileSize}
-                                  </p>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <p className="submission-file">
+                                      📎 {sub.fileName} · {sub.fileSize}
+                                    </p>
+                                    <button 
+                                      className="btn-download-mini" 
+                                      onClick={() => handleDownload(sub.fileData, sub.fileName)}
+                                      title="Descargar Trabajo"
+                                      style={{ padding: '4px', borderRadius: '4px', background: 'var(--primary)', color: 'white', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                                    >
+                                      <Download size={14} />
+                                    </button>
+                                  </div>
                                   {sub.comment && (
                                     <p className="submission-comment">"{sub.comment}"</p>
                                   )}
@@ -369,7 +389,21 @@ const ClassView = ({ classId }) => {
                         </span>
                         <span style={{fontSize: '10px', color: 'var(--text-dim)'}}>{res.size} • {res.type}</span>
                       </div>
-                      <FileText size={14} style={{opacity: 0.5}} />
+                      <button 
+                        onClick={() => {
+                          if (!res.fileData) return;
+                          const link = document.createElement('a');
+                          link.href = res.fileData;
+                          link.download = res.fileName || res.title;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                        }}
+                        style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer', padding: '4px' }}
+                        title="Descargar Recurso"
+                      >
+                        <Download size={14} />
+                      </button>
                     </div>
                   ))
                 ) : (
@@ -408,11 +442,13 @@ const ClassView = ({ classId }) => {
         onClose={() => setShowTaskModal(false)} 
         currentClass={currentClass} 
       />
-      <AddResourceModal 
-        isOpen={showResourceModal} 
-        onClose={() => setShowResourceModal(false)} 
-        currentClass={currentClass} 
-      />
+      {showResourceModal && currentClass && (
+        <AddResourceModal 
+          isOpen={true} 
+          onClose={() => setShowResourceModal(false)} 
+          currentClass={currentClass} 
+        />
+      )}
       <SubmitWorkModal
         isOpen={!!selectedTask}
         onClose={() => setSelectedTask(null)}

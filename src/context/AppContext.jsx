@@ -37,8 +37,20 @@ const loadFromStorage = (key) => {
 };
 
 const saveToStorage = (key, data) => {
-  localStorage.setItem(key, JSON.stringify(data));
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (e) {
+    console.warn(`[EduTech] No se pudo guardar en localStorage (${key}):`, e.message);
+  }
 };
+
+/**
+ * Strip heavy binary data (fileData) before persisting to localStorage.
+ * This prevents QuotaExceededError when storing large PDFs.
+ * The actual file data is kept only in React state (memory).
+ */
+const stripFileData = (items) =>
+  items.map(({ fileData, ...rest }) => rest);
 
 // ─── Context ─────────────────────────────────────────
 const AppContext = createContext(null);
@@ -55,10 +67,11 @@ export function AppProvider({ children }) {
   // Persist all state whenever it changes
   useEffect(() => { saveToStorage(KEYS.CLASSES, classes); }, [classes]);
   useEffect(() => { saveToStorage(KEYS.TASKS, tasks); }, [tasks]);
-  useEffect(() => { saveToStorage(KEYS.RESOURCES, resources); }, [resources]);
+  // Resources & Submissions: strip fileData before saving to avoid localStorage quota errors
+  useEffect(() => { saveToStorage(KEYS.RESOURCES, stripFileData(resources)); }, [resources]);
   useEffect(() => { saveToStorage(KEYS.MESSAGES, messages); }, [messages]);
   useEffect(() => { saveToStorage(KEYS.EVENTS, events); }, [events]);
-  useEffect(() => { saveToStorage(KEYS.SUBMISSIONS, submissions); }, [submissions]);
+  useEffect(() => { saveToStorage(KEYS.SUBMISSIONS, stripFileData(submissions)); }, [submissions]);
 
   /**
    * Auth
@@ -104,6 +117,7 @@ export function AppProvider({ children }) {
     const newTask = {
       id: Math.random().toString(36).substr(2, 9),
       ...taskData,
+      creatorEmail: currentUser?.email || '',
       createdAt: new Date().toISOString(),
     };
     setTasks(prev => [...prev, newTask]);
