@@ -6,6 +6,7 @@ import './CreateClassModal.css'; // Reuse existing modal styles
 const AddTaskModal = ({ isOpen, onClose, currentClass }) => {
   const { addTask } = useAppContext();
   const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [priority, setPriority] = useState('medium');
   const [error, setError] = useState('');
@@ -18,6 +19,7 @@ const AddTaskModal = ({ isOpen, onClose, currentClass }) => {
     setTimeout(() => {
       setClosing(false);
       setTitle('');
+      setDescription('');
       setDueDate('');
       setPriority('medium');
       setError('');
@@ -29,7 +31,7 @@ const AddTaskModal = ({ isOpen, onClose, currentClass }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!title || !dueDate) {
-      setError('Completá todos los campos.');
+      setError('Completá todos los campos obligatorios.');
       return;
     }
 
@@ -38,6 +40,7 @@ const AddTaskModal = ({ isOpen, onClose, currentClass }) => {
       const result = addTask({ 
         classId: currentClass.id, 
         title, 
+        description,
         dueDate, 
         priority, 
         subject: currentClass.materia,
@@ -90,13 +93,28 @@ const AddTaskModal = ({ isOpen, onClose, currentClass }) => {
               <input 
                 type="text" 
                 placeholder="Ej: Informe de Práctica 4" 
-                className="modal-input" // I might need to add this class to CSS
+                className="modal-input"
                 style={{
                   background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', 
                   padding: '14px', borderRadius: '12px', color: 'white'
                 }}
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+
+            <div className="form-field">
+              <label><AlertCircle size={16} className="label-icon" /> Descripción / Instrucciones</label>
+              <textarea 
+                placeholder="Explica qué deben entregar los alumnos..." 
+                className="modal-input"
+                style={{
+                  background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.1)', 
+                  padding: '14px', borderRadius: '12px', color: 'white',
+                  minHeight: '100px', resize: 'vertical'
+                }}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
               />
             </div>
 

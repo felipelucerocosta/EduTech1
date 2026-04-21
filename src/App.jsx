@@ -8,6 +8,7 @@ import ClassView from './components/ClassView';
 import Deliveries from './components/Deliveries';
 import Resources from './components/Resources';
 import Support from './components/Support';
+import Calendar from './components/Calendar';
 
 function AppInner() {
   const { currentUser, logout } = useAppContext();

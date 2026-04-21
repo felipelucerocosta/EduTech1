@@ -22,6 +22,8 @@ const KEYS = {
   TASKS: 'edutech_tasks',
   RESOURCES: 'edutech_resources',
   MESSAGES: 'edutech_messages',
+  EVENTS: 'edutech_events',
+  SUBMISSIONS: 'edutech_submissions',
 };
 
 // ─── Persistence helpers ─────────────────────────────
@@ -47,12 +49,16 @@ export function AppProvider({ children }) {
   const [tasks, setTasks] = useState(() => loadFromStorage(KEYS.TASKS));
   const [resources, setResources] = useState(() => loadFromStorage(KEYS.RESOURCES));
   const [messages, setMessages] = useState(() => loadFromStorage(KEYS.MESSAGES));
+  const [events, setEvents] = useState(() => loadFromStorage(KEYS.EVENTS));
+  const [submissions, setSubmissions] = useState(() => loadFromStorage(KEYS.SUBMISSIONS));
 
   // Persist all state whenever it changes
   useEffect(() => { saveToStorage(KEYS.CLASSES, classes); }, [classes]);
   useEffect(() => { saveToStorage(KEYS.TASKS, tasks); }, [tasks]);
   useEffect(() => { saveToStorage(KEYS.RESOURCES, resources); }, [resources]);
   useEffect(() => { saveToStorage(KEYS.MESSAGES, messages); }, [messages]);
+  useEffect(() => { saveToStorage(KEYS.EVENTS, events); }, [events]);
+  useEffect(() => { saveToStorage(KEYS.SUBMISSIONS, submissions); }, [submissions]);
 
   /**
    * Auth
@@ -133,6 +139,61 @@ export function AppProvider({ children }) {
     return { success: true };
   };
 
+  /**
+   * Event Management (Calendar)
+   */
+  const addEvent = (eventData) => {
+    const newEvent = {
+      id: Math.random().toString(36).substr(2, 9),
+      ...eventData,
+      createdAt: new Date().toISOString(),
+    };
+    setEvents(prev => [...prev, newEvent]);
+    return { success: true };
+  };
+
+  const deleteEvent = (eventId) => {
+    setEvents(prev => prev.filter(e => e.id !== eventId));
+  };
+
+  /**
+   * Submission Management (Student Work Delivery)
+   */
+  const addSubmission = (submissionData) => {
+    // Check if already submitted for this task by this user
+    const existing = submissions.find(
+      s => s.taskId === submissionData.taskId && s.authorEmail === currentUser?.email
+    );
+    if (existing) {
+      // Update existing submission
+      setSubmissions(prev => prev.map(s =>
+        s.id === existing.id ? { ...s, ...submissionData, updatedAt: new Date().toISOString() } : s
+      ));
+      return { success: true, updated: true };
+    }
+    const newSubmission = {
+      id: Math.random().toString(36).substr(2, 9),
+      ...submissionData,
+      authorName: currentUser?.name || 'Alumno',
+      authorEmail: currentUser?.email || '',
+      submittedAt: new Date().toISOString(),
+    };
+    setSubmissions(prev => [...prev, newSubmission]);
+    return { success: true };
+  };
+
+  /**
+   * Grade a submission (Professor only)
+   */
+  const gradeSubmission = (submissionId, grade, feedback) => {
+    setSubmissions(prev => prev.map(s =>
+      s.id === submissionId
+        ? { ...s, grade, feedback, gradedAt: new Date().toISOString() }
+        : s
+    ));
+    return { success: true };
+  };
+
   return (
     <AppContext.Provider
       value={{ 
@@ -141,6 +202,8 @@ export function AppProvider({ children }) {
         tasks, 
         resources, 
         messages,
+        events,
+        submissions,
         login, 
         logout, 
         addClass, 
@@ -148,6 +211,10 @@ export function AppProvider({ children }) {
         addTask,
         addResource,
         addMessage,
+        addEvent,
+        deleteEvent,
+        addSubmission,
+        gradeSubmission,
       }}
     >
       {children}

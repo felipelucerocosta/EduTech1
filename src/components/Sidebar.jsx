@@ -1,5 +1,4 @@
-import React from 'react';
-import { LayoutDashboard, CalendarDays, FolderOpen, HelpCircle } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, Calendar, FolderOpen, HelpCircle } from 'lucide-react';
 import './Sidebar.css';
 
 const Sidebar = ({ activeItem = 'dashboard', onViewChange }) => {
